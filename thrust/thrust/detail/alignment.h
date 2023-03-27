@@ -36,7 +36,7 @@ namespace detail
 
 /// \p THRUST_ALIGNOF is a macro that takes a single type-id as a parameter,
 /// and returns the alignment requirement of the type in bytes.
-/// 
+///
 /// It is an approximation of C++11's `alignof` operator.
 ///
 /// Note: MSVC does not allow the builtin used to implement this to be placed
@@ -44,7 +44,7 @@ namespace detail
 /// assign the result of \p THRUST_ALIGNOF to a variable and pass the variable
 /// as the argument to `__declspec(align(#))`.
 #if THRUST_CPP_DIALECT >= 2011
-    #define THRUST_ALIGNOF(x) alignof(x) 
+    #define THRUST_ALIGNOF(x) alignof(x)
 #else
     #define THRUST_ALIGNOF(x) __alignof(x)
 #endif
@@ -52,7 +52,7 @@ namespace detail
 /// \p alignment_of provides the member constant `value` which is equal to the
 /// alignment requirement of the type `T`, as if obtained by a C++11 `alignof`
 /// expression.
-/// 
+///
 /// It is an implementation of C++11's \p std::alignment_of.
 #if THRUST_CPP_DIALECT >= 2011
     template <typename T>
@@ -110,9 +110,9 @@ struct aligned_type;
     || (   (THRUST_HOST_COMPILER == THRUST_HOST_COMPILER_GCC)                 \
         && (THRUST_GCC_VERSION < 40600))
     // C++03 implementation for MSVC and GCC <= 4.5.
-    // 
+    //
     // We have to implement `aligned_type` with specializations for MSVC
-    // and GCC 4.2.x and older because they require literals as arguments to 
+    // and GCC 4.2.x and older because they require literals as arguments to
     // their alignment attribute.
 
     #if (THRUST_HOST_COMPILER == THRUST_HOST_COMPILER_MSVC)
@@ -134,7 +134,7 @@ struct aligned_type;
             };                                                                \
             /**/
     #endif
-    
+
     THRUST_DEFINE_ALIGNED_TYPE_SPECIALIZATION(1);
     THRUST_DEFINE_ALIGNED_TYPE_SPECIALIZATION(2);
     THRUST_DEFINE_ALIGNED_TYPE_SPECIALIZATION(4);
@@ -157,10 +157,23 @@ struct aligned_type;
 /// \p aligned_storage provides the nested type `type`, which is a trivial type
 /// suitable for use as uninitialized storage for any object whose size is at
 /// most `Len` bytes and whose alignment requirement is a divisor of `Align`.
-/// 
+///
 /// The behavior is undefined if `Len` is 0 or `Align` is not a power of 2.
 ///
 /// It is an implementation of C++11's \p std::aligned_storage.
+///
+/// It has been deprecated with C++23.
+
+#if THRUST_CPP_DIALECT > 2020 // aligned_storage has been deprecated in c++23
+#if (THRUST_HOST_COMPILER == THRUST_HOST_COMPILER_CLANG)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif (THRUST_HOST_COMPILER == THRUST_HOST_COMPILER_GCC)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+#endif // THRUST_CPP_DIALECT > 2020
+
 #if THRUST_CPP_DIALECT >= 2011
     template <std::size_t Len, std::size_t Align>
     using aligned_storage = std::aligned_storage<Len, Align>;
@@ -179,6 +192,14 @@ struct aligned_type;
         };
     };
 #endif
+
+#if THRUST_CPP_DIALECT > 2020 // aligned_storage has been deprecated in c++23
+#if (THRUST_HOST_COMPILER == THRUST_HOST_COMPILER_CLANG)
+#pragma clang diagnostic pop
+#elif (THRUST_HOST_COMPILER == THRUST_HOST_COMPILER_GCC)
+#pragma GCC diagnostic pop
+#endif
+#endif // THRUST_CPP_DIALECT > 2020
 
 /// \p max_align_t is a trivial type whose alignment requirement is at least as
 /// strict (as large) as that of every scalar type.

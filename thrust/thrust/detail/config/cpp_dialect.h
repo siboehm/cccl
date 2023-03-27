@@ -75,10 +75,12 @@
 #    define THRUST_CPP_DIALECT 2011
 #  elif THRUST_CPLUSPLUS < 201703L
 #    define THRUST_CPP_DIALECT 2014
-#  elif THRUST_CPLUSPLUS == 201703L
+#  elif THRUST_CPLUSPLUS < 202002L
 #    define THRUST_CPP_DIALECT 2017
-#  elif THRUST_CPLUSPLUS > 201703L // unknown, but is higher than 2017.
+#  elif THRUST_CPLUSPLUS == 202002L
 #    define THRUST_CPP_DIALECT 2020
+#  else
+#    define THRUST_CPP_DIALECT 2099 // Greater than current standard.
 #  endif
 
 #  undef THRUST_CPLUSPLUS // cleanup
