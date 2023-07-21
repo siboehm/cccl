@@ -5,7 +5,8 @@ on:
     inputs:
       per_cuda_compiler_matrix: {type: string, required: true}
       build_script: {type: string, required: false}
-      test_script: {type: string, required: false}
+      test_script:  {type: string, required: false}
+      nvrtc_script: {type: string, required: false}
 
 jobs:
   # Using a matrix to dispatch to the build-and-test reusable workflow for each build configuration
@@ -30,6 +31,8 @@ jobs:
       build_script: ${{ inputs.build_script }}
       build_image: rapidsai/devcontainers:23.06-cpp-${{matrix.compiler.name}}${{matrix.compiler.version}}-cuda${{matrix.cuda}}-${{matrix.os}}
       test_script: ${{ inputs.test_script }}
+      nvrtc_script: ${{ inputs.nvrtc_script }}
+      run_nvrtc: ${{ contains(matrix.jobs, 'nvrtc') }}
       run_tests: ${{ contains(matrix.jobs, 'test') && !contains(github.event.head_commit.message, 'skip-tests') }}
       test_image: rapidsai/devcontainers:23.06-cpp-${{matrix.compiler.name}}${{matrix.compiler.version}}-cuda${{matrix.cuda}}-${{matrix.os}}
 
